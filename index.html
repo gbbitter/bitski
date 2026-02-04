@@ -14,7 +14,6 @@
             --accent-cyan: #00e5ff;
             --accent-blue: #3399ff;
             --text-secondary: #b2c9e0;
-            --snow-white: #ffffff;
         }
 
         body {
@@ -73,13 +72,14 @@
             scrollbar-width: none;
         }
         .weather-day {
-            min-width: 70px;
+            min-width: 85px;
             background: rgba(255,255,255,0.05);
             padding: 12px 8px;
             border-radius: 12px;
             text-align: center;
             font-size: 0.8rem;
         }
+        .snow-val-day { color: var(--accent-cyan); font-weight: 700; margin-top: 5px; font-size: 0.75rem; }
 
         /* Snow Levels */
         .snow-box { background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; margin: 15px 0; }
@@ -129,30 +129,30 @@
             id: 'bergeralm',
             name: "Bergeralm",
             lifts: "6/7",
-            snow: { dal: 10, midden: 25, berg: 40, fresh: 5 },
+            snow_base: { dal: 10, midden: 25, berg: 40 },
             lat: 47.091, lon: 11.451,
             webcam: "https://www.foto-webcam.eu/webcam/bergeralm/",
             map: "https://www.bergeralm.net/wp-content/uploads/2023/10/Pistenplan_Bergeralm_2023_2024.pdf",
-            radar: "https://www.weerplaza.nl/regenradar/oostenrijk/steinach-am-brenner/10332/"
+            radar: "https://www.windy.com/47.091/11.451?radar,47.091,11.451,11"
         },
         {
             id: 'ladurns',
             name: "Ladurns",
             lifts: "3/3",
-            snow: { dal: 25, midden: 50, berg: 75, fresh: 12 },
+            snow_base: { dal: 25, midden: 50, berg: 75 },
             lat: 46.903, lon: 11.415,
             webcam: "https://www.ladurns.it/en/webcams",
             map: "https://www.ladurns.it/fileadmin/user_upload/Pistenplan_Ladurns.jpg",
-            radar: "https://www.vorderkaslach.it/weer-en-webcam/regenradar-zuid-tirol/"
+            radar: "https://www.windy.com/46.903/11.415?radar,46.903,11.415,11"
         },
         {
             id: 'superdevoluy',
             name: "Superdévoluy",
             lifts: "17/20",
-            snow: { dal: 30, midden: 95, berg: 165, fresh: 2 },
+            snow_base: { dal: 30, midden: 95, berg: 165 },
             lat: 44.673, lon: 5.918,
             webcam: "https://www.ledevoluy.com/en/live-experience/webcams/",
-            map: "https://www.skiresort.nl/skigebied/le-devoluy-superdevoluy-la-joue-du-loup/pistekaart/",
+            map: "https://www.ledevoluy.com/fr/hiver/ski-glisse/domaine-skiable/plan-des-pistes/",
             radar: "https://www.meteofrance.com/meteo-montagne/le-devoluy/050401"
         }
     ];
@@ -169,18 +169,19 @@
         const resort = RESORTS.find(r => r.id === id);
         const detailDiv = document.getElementById('detail-content');
         
-        // Fetch 7-daagse voorspelling
-        const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`);
+        // Fetch 7-daagse voorspelling inclusief snowfall_sum
+        const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum&timezone=auto`);
         const weatherData = await weatherResp.json();
+        const freshToday = weatherData.daily.snowfall_sum[0];
 
         detailDiv.innerHTML = `
             <div class="detail-card">
                 <h2 style="font-family:'Bebas Neue'; font-size:2.4rem; margin:0;">${resort.name}</h2>
-                <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:15px;">Huidige status: <strong>${resort.lifts} liften open</strong></p>
+                <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:15px;">Status: <strong>${resort.lifts} liften open</strong></p>
                 
                 <div class="fresh-badge">
-                    <span>❄️ Verwachte sneeuw (24u)</span>
-                    <div style="font-size:1.6rem; font-weight:800;">+ ${resort.snow.fresh} cm</div>
+                    <span>❄️ Verwachte sneeuw (Vandaag)</span>
+                    <div style="font-size:1.6rem; font-weight:800;">+ ${Math.round(freshToday)} cm</div>
                 </div>
 
                 <div class="weather-scroll">
@@ -188,22 +189,23 @@
                         <div class="weather-day">
                             <div style="font-weight:600; margin-bottom:5px;">${new Date(date).toLocaleDateString('nl', {weekday:'short'})}</div>
                             <div style="font-size:1.4rem;">${getWeatherIcon(weatherData.daily.weather_code[i])}</div>
-                            <div style="margin-top:5px;">${Math.round(weatherData.daily.temperature_2m_max[i])}°</div>
+                            <div style="margin-top:5px; font-weight:bold;">${Math.round(weatherData.daily.temperature_2m_max[i])}°</div>
+                            <div class="snow-val-day">${weatherData.daily.snowfall_sum[i] > 0 ? '❄️ ' + Math.round(weatherData.daily.snowfall_sum[i]) + 'cm' : '-'}</div>
                         </div>
                     `).join('')}
                 </div>
 
                 <div class="snow-box">
-                    <div class="snow-line"><span>🏔️ Berg</span> <strong>${resort.snow.berg} cm</strong></div>
-                    <div class="snow-line"><span>⛷️ Midden</span> <strong>${resort.snow.midden} cm</strong></div>
-                    <div class="snow-line"><span>🏠 Dal</span> <strong>${resort.snow.dal} cm</strong></div>
+                    <div class="snow-line"><span>🏔️ Berg</span> <strong>${resort.snow_base.berg} cm</strong></div>
+                    <div class="snow-line"><span>⛷️ Midden</span> <strong>${resort.snow_base.midden} cm</strong></div>
+                    <div class="snow-line"><span>🏠 Dal</span> <strong>${resort.snow_base.dal} cm</strong></div>
                 </div>
 
                 <div class="action-grid">
                     <a href="${resort.webcam}" target="_blank" class="btn btn-blue">📸 Webcam</a>
                     <a href="${resort.map}" target="_blank" class="btn btn-green">🗺️ Pistekaart</a>
                     <a href="${resort.radar}" target="_blank" class="btn btn-red">📡 Radar</a>
-                    <a href="https://www.google.com/maps/search/?api=1&query=${resort.lat},${resort.lon}" target="_blank" class="btn btn-full">🚗 Navigeer naar Gebied</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-full">🚗 Navigeer naar Gebied</a>
                 </div>
             </div>
         `;
@@ -224,7 +226,7 @@
             <div class="menu-item" onclick="showDetails('${r.id}')">
                 <div>
                     <div class="menu-name">${r.name}</div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary)">${r.lifts} liften • ${r.snow.berg}cm top</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary)">${r.lifts} liften • ${r.snow_base.berg}cm top</div>
                 </div>
                 <div style="font-size:1.5rem">🏔️</div>
             </div>
