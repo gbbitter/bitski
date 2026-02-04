@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ski Conditions Pro</title>
+    <title>Ski & Après Pro</title>
     <base href="/wintersport/">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
             --bg-card: #132f4c;
             --accent-cyan: #00e5ff;
             --accent-blue: #3399ff;
+            --accent-orange: #ff9f43;
             --text-secondary: #b2c9e0;
         }
 
@@ -25,84 +26,62 @@
         }
 
         .container { max-width: 500px; margin: 0 auto; }
-        
-        header { text-align: center; padding: 30px 0; }
-        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--accent-cyan); margin: 0; letter-spacing: 1px; }
+        header { text-align: center; padding: 25px 0; }
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--accent-cyan); margin: 0; }
 
-        /* Dashboard */
         .menu-grid { display: grid; gap: 12px; }
         .menu-item {
             background: var(--bg-card);
-            padding: 18px;
-            border-radius: 18px;
+            padding: 20px;
+            border-radius: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid rgba(255,255,255,0.05);
             cursor: pointer;
         }
-        .menu-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; line-height: 1; }
 
-        /* Detail Pagina */
         .page { display: none; animation: slideIn 0.3s ease-out; }
         .page.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .back-btn { background: none; border: none; color: var(--accent-cyan); cursor: pointer; padding: 10px 0; font-size: 1rem; font-weight: 600; }
+        .back-btn { background: none; border: none; color: var(--accent-cyan); cursor: pointer; padding: 10px 0; font-weight: 600; }
         
-        .detail-card { background: var(--bg-card); border-radius: 24px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .detail-card { background: var(--bg-card); border-radius: 24px; padding: 20px; }
         
-        .fresh-badge {
-            background: rgba(0, 229, 255, 0.15);
-            color: var(--accent-cyan);
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 15px 0;
-            border: 1px solid rgba(0, 229, 255, 0.3);
-        }
-
-        /* Weather Strip */
         .weather-scroll {
             display: flex;
             overflow-x: auto;
-            gap: 12px;
-            padding: 10px 0;
-            margin: 20px 0;
+            gap: 10px;
+            margin: 15px 0;
+            padding-bottom: 5px;
             scrollbar-width: none;
         }
         .weather-day {
-            min-width: 85px;
+            min-width: 80px;
             background: rgba(255,255,255,0.05);
-            padding: 12px 8px;
+            padding: 10px;
             border-radius: 12px;
             text-align: center;
-            font-size: 0.8rem;
         }
-        .snow-val-day { color: var(--accent-cyan); font-weight: 700; margin-top: 5px; font-size: 0.75rem; }
 
-        /* Snow Levels */
-        .snow-box { background: rgba(0,0,0,0.2); border-radius: 15px; padding: 15px; margin: 15px 0; }
-        .snow-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* Action Buttons */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn {
-            padding: 14px;
+        /* Après-ski Section */
+        .apres-section { margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .apres-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--accent-orange); margin-bottom: 10px; }
+        .venue-card {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
             border-radius: 12px;
-            text-align: center;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            font-size: 0.85rem;
+            margin-bottom: 10px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
-        .btn-blue { background: var(--accent-blue); }
-        .btn-red { background: #eb4d4b; }
-        .btn-green { background: #6ab04c; }
+        .venue-info div { font-weight: 700; font-size: 0.9rem; }
+        .venue-info span { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn { padding: 12px; border-radius: 12px; text-decoration: none; color: white; font-weight: bold; font-size: 0.8rem; text-align: center; }
         .btn-full { grid-column: span 2; background: #30336b; }
     </style>
 </head>
@@ -118,7 +97,7 @@
     </div>
 
     <div id="details" class="page">
-        <button class="back-btn" onclick="showDashboard()">← Overzicht</button>
+        <button class="back-btn" onclick="showDashboard()">← Terug naar kaart</button>
         <div id="detail-content"></div>
     </div>
 </div>
@@ -131,9 +110,13 @@
             lifts: "6/7",
             snow_base: { dal: 10, midden: 25, berg: 40 },
             lat: 47.091, lon: 11.451,
+            radar: "https://www.windy.com/47.091/11.451?radar,47.091,11.451,11",
             webcam: "https://www.foto-webcam.eu/webcam/bergeralm/",
             map: "https://www.bergeralm.net/wp-content/uploads/2023/10/Pistenplan_Bergeralm_2023_2024.pdf",
-            radar: "https://www.windy.com/47.091/11.451?radar,47.091,11.451,11"
+            venues: [
+                { name: "Bergeralm Panoramarestaurant", type: "Lunch met uitzicht", icon: "🍔" },
+                { name: "Hennensteigen", type: "Klassieke Après-ski", icon: "🍻" }
+            ]
         },
         {
             id: 'ladurns',
@@ -141,9 +124,13 @@
             lifts: "3/3",
             snow_base: { dal: 25, midden: 50, berg: 75 },
             lat: 46.903, lon: 11.415,
+            radar: "https://www.windy.com/46.903/11.415?radar,46.903,11.415,11",
             webcam: "https://www.ladurns.it/en/webcams",
             map: "https://www.ladurns.it/fileadmin/user_upload/Pistenplan_Ladurns.jpg",
-            radar: "https://www.windy.com/46.903/11.415?radar,46.903,11.415,11"
+            venues: [
+                { name: "Edelweisshütte", type: "Tiroler specialiteiten", icon: "🥨" },
+                { name: "Pfeifer Huisele", type: "Gezellige hut", icon: "🍷" }
+            ]
         },
         {
             id: 'superdevoluy',
@@ -151,65 +138,57 @@
             lifts: "17/20",
             snow_base: { dal: 30, midden: 95, berg: 165 },
             lat: 44.673, lon: 5.918,
+            radar: "https://www.meteofrance.com/meteo-montagne/le-devoluy/050401",
             webcam: "https://www.ledevoluy.com/en/live-experience/webcams/",
-            map: "https://www.ledevoluy.com/fr/hiver/ski-glisse/domaine-skiable/plan-des-pistes/",
-            radar: "https://www.meteofrance.com/meteo-montagne/le-devoluy/050401"
+            map: "https://www.ledevoluy.com/en/winter/skiing-gliding/ski-resort/piste-map/",
+            venues: [
+                { name: "La Table du Dévoluy", type: "Top-level burgers", icon: "🍔" },
+                { name: "Le Chardons", type: "Terras in de zon", icon: "☀️" }
+            ]
         }
     ];
 
-    function getWeatherIcon(code) {
-        if (code >= 71) return '❄️';
-        if (code >= 61) return '🌧️';
-        if (code >= 1 && code <= 3) return '🌤️';
-        if (code === 0) return '☀️';
-        return '☁️';
-    }
-
     async function showDetails(id) {
         const resort = RESORTS.find(r => r.id === id);
-        const detailDiv = document.getElementById('detail-content');
-        
-        // Fetch 7-daagse voorspelling inclusief snowfall_sum
         const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum&timezone=auto`);
-        const weatherData = await weatherResp.json();
-        const freshToday = weatherData.daily.snowfall_sum[0];
+        const data = await weatherResp.json();
 
-        detailDiv.innerHTML = `
+        document.getElementById('detail-content').innerHTML = `
             <div class="detail-card">
-                <h2 style="font-family:'Bebas Neue'; font-size:2.4rem; margin:0;">${resort.name}</h2>
-                <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:15px;">Status: <strong>${resort.lifts} liften open</strong></p>
-                
-                <div class="fresh-badge">
-                    <span>❄️ Verwachte sneeuw (Vandaag)</span>
-                    <div style="font-size:1.6rem; font-weight:800;">+ ${Math.round(freshToday)} cm</div>
-                </div>
+                <h2 style="font-family:'Bebas Neue'; font-size:2.5rem; margin:0;">${resort.name}</h2>
+                <div style="color:var(--accent-cyan); font-weight:800; margin-bottom:15px;">❄️ +${Math.round(data.daily.snowfall_sum[0])}cm vandaag</div>
 
                 <div class="weather-scroll">
-                    ${weatherData.daily.time.map((date, i) => `
+                    ${data.daily.time.map((t, i) => `
                         <div class="weather-day">
-                            <div style="font-weight:600; margin-bottom:5px;">${new Date(date).toLocaleDateString('nl', {weekday:'short'})}</div>
-                            <div style="font-size:1.4rem;">${getWeatherIcon(weatherData.daily.weather_code[i])}</div>
-                            <div style="margin-top:5px; font-weight:bold;">${Math.round(weatherData.daily.temperature_2m_max[i])}°</div>
-                            <div class="snow-val-day">${weatherData.daily.snowfall_sum[i] > 0 ? '❄️ ' + Math.round(weatherData.daily.snowfall_sum[i]) + 'cm' : '-'}</div>
+                            <div style="font-size:0.7rem;">${new Date(t).toLocaleDateString('nl', {weekday:'short'})}</div>
+                            <div style="font-size:1.2rem; margin:5px 0;">${data.daily.weather_code[i] > 70 ? '❄️' : '☀️'}</div>
+                            <div style="font-weight:bold;">${Math.round(data.daily.temperature_2m_max[i])}°</div>
                         </div>
                     `).join('')}
                 </div>
 
-                <div class="snow-box">
-                    <div class="snow-line"><span>🏔️ Berg</span> <strong>${resort.snow_base.berg} cm</strong></div>
-                    <div class="snow-line"><span>⛷️ Midden</span> <strong>${resort.snow_base.midden} cm</strong></div>
-                    <div class="snow-line"><span>🏠 Dal</span> <strong>${resort.snow_base.dal} cm</strong></div>
+                <div class="apres-section">
+                    <div class="apres-title">Lekker eten & Après-ski</div>
+                    ${resort.venues.map(v => `
+                        <div class="venue-card">
+                            <div class="venue-info">
+                                <div>${v.name}</div>
+                                <span>${v.type}</span>
+                            </div>
+                            <div style="font-size:1.5rem;">${v.icon}</div>
+                        </div>
+                    `).join('')}
                 </div>
 
                 <div class="action-grid">
-                    <a href="${resort.webcam}" target="_blank" class="btn btn-blue">📸 Webcam</a>
-                    <a href="${resort.map}" target="_blank" class="btn btn-green">🗺️ Pistekaart</a>
-                    <a href="${resort.radar}" target="_blank" class="btn btn-red">📡 Radar</a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-full">🚗 Navigeer naar Gebied</a>
+                    <a href="${resort.webcam}" target="_blank" class="btn" style="background:#3399ff">Webcam</a>
+                    <a href="${resort.map}" target="_blank" class="btn" style="background:#6ab04c">Pistekaart</a>
+                    <a href="${resort.radar}" target="_blank" class="btn" style="background:#eb4d4b">Sneeuw Radar</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-full">🚗 Start Navigatie</a>
                 </div>
             </div>
         `;
-
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('details').classList.add('active');
     }
@@ -221,20 +200,17 @@
     }
 
     function renderMenu() {
-        const menu = document.getElementById('menu');
-        menu.innerHTML = RESORTS.map(r => `
+        document.getElementById('menu').innerHTML = RESORTS.map(r => `
             <div class="menu-item" onclick="showDetails('${r.id}')">
                 <div>
                     <div class="menu-name">${r.name}</div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary)">${r.lifts} liften • ${r.snow_base.berg}cm top</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary)">${r.lifts} liften • ${r.snow_base.berg}cm</div>
                 </div>
-                <div style="font-size:1.5rem">🏔️</div>
+                <div style="font-size:1.2rem;">⛷️</div>
             </div>
         `).join('');
     }
-
     renderMenu();
 </script>
-
 </body>
 </html>
