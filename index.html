@@ -518,40 +518,43 @@
 
     <script>
         const RESORTS = [
-            {
-                name: 'Bergeralm',
-                location: 'Steinach am Brenner, Oostenrijk',
-                coords: { lat: 47.0858, lon: 11.4650 },
-                elevation: 1800,
-                totalLifts: 5,
-                pisteMapUrl: 'https://www.bergfex.com/bergeralm/panorama/',
-                webcamUrl: 'https://www.bergeralm.net/en/webcam/',
-                officialUrl: 'https://www.bergeralm.net/en/',
-                mapsUrl: 'https://www.google.com/maps/dir//Bergeralm,+Austria/@47.0858,11.4650,15z'
-            },
-            {
-                name: 'Ladurns',
-                location: 'Zuid-Tirol, Italië',
-                coords: { lat: 46.8833, lon: 11.4500 },
-                elevation: 1900,
-                totalLifts: 4,
-                pisteMapUrl: 'https://www.bergfex.com/ladurns-gossensass-pflerschtal/panorama/',
-                webcamUrl: 'https://www.ladurns.it/en/services/webcams',
-                officialUrl: 'https://www.ladurns.it/en/',
-                mapsUrl: 'https://www.google.com/maps/dir//Ladurns,+Italy/@46.8833,11.4500,15z'
-            },
-            {
-                name: 'Superdévoluy',
-                location: 'Hautes-Alpes, Frankrijk',
-                coords: { lat: 44.6833, lon: 6.0167 },
-                elevation: 1850,
-                totalLifts: 20,
-                pisteMapUrl: 'https://www.ledevoluy.com/winter/skiing-and-snowboarding/trail-map/',
-                webcamUrl: 'https://www.ledevoluy.com/winter/live/webcams/',
-                officialUrl: 'https://www.ledevoluy.com/en/',
-                mapsUrl: 'https://www.google.com/maps/dir//Superdévoluy,+France/@44.6833,6.0167,15z'
-            }
-        ];
+    {
+        name: 'Bergeralm',
+        location: 'Steinach am Brenner, AT',
+        // Coördinaten van de Nösslachjoch (top)
+        coords: { lat: 47.091, lon: 11.451 }, 
+        elevation: 2231,
+        totalLifts: 5,
+        pisteMapUrl: 'https://www.bergfex.com/bergeralm/panorama/',
+        webcamUrl: 'https://www.bergeralm.net/en/webcam/',
+        officialUrl: 'https://www.bergeralm.net/en/',
+        mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Bergeralm+Ski'
+    },
+    {
+        name: 'Ladurns',
+        location: 'Zuid-Tirol, IT',
+        // Coördinaten van het bergstation (Wastelegg)
+        coords: { lat: 46.903, lon: 11.415 },
+        elevation: 2023,
+        totalLifts: 4,
+        pisteMapUrl: 'https://www.bergfex.com/ladurns-gossensass-pflerschtal/panorama/',
+        webcamUrl: 'https://www.ladurns.it/en/services/webcams',
+        officialUrl: 'https://www.ladurns.it/en/',
+        mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Ladurns+Ski'
+    },
+    {
+        name: 'Superdévoluy',
+        location: 'Hautes-Alpes, FR',
+        // Coördinaten van de top van Le Pierra
+        coords: { lat: 44.673, lon: 5.918 },
+        elevation: 2500,
+        totalLifts: 20,
+        pisteMapUrl: 'https://www.ledevoluy.com/winter/skiing-and-snowboarding/trail-map/',
+        webcamUrl: 'https://www.ledevoluy.com/winter/live/webcams/',
+        officialUrl: 'https://www.ledevoluy.com/en/',
+        mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Superdevoluy+Ski'
+    }
+];
 
         let deferredPrompt;
 
@@ -598,21 +601,50 @@
             sessionStorage.setItem('installBannerClosed', 'true');
         });
 
-      async function fetchWeatherData(resort) {
+     async function fetchWeatherData(resort) {
     try {
-        // We roepen nu de specifieke 'marine' en 'weather' endpoints aan voor betere bergdata
-        // snow_depth zit in de standaard forecast bij Open-Meteo
+        // We gebruiken de 'best_match' modellen van Open-Meteo voor berg-nauwkeurigheid
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,snow_depth&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,uv_index_max,sunshine_duration&timezone=auto&forecast_days=7`;
         
         const response = await fetch(url);
-        if (!response.ok) throw new Error('Weer data niet beschikbaar');
-        
+        if (!response.ok) throw new Error('Netwerk response was niet ok');
         const data = await response.json();
         
-        // Echte sneeuwhoogte uit de API (is vaak in meters, dus we rekenen om naar cm)
-        // Let op: als de API 0 geeft maar het is hoogseizoen, vallen we terug op een veilige schatting
-        let snowDepth = Math.round(data.current.snow_depth * 100); 
-        if (snowDepth === 0 && new Date().getMonth() < 3) snowDepth = 45; // Fallback voor sensoren die op 0 staan
+        // Echte sneeuwhoogte in cm (API geeft meters)
+        let rawSnow = data.current.snow_depth || 0;
+        let snowDepth = Math.round(rawSnow * 100);
+
+        // Wind check: Liften sluiten vaak bij harde wind (60+ km/u)
+        const wind = data.current.wind_speed_10m;
+        let openLifts = resort.totalLifts;
+        if (wind > 65) openLifts = 0;
+        else if (wind > 45) openLifts = Math.floor(resort.totalLifts * 0.4);
+
+        return {
+            temperature: Math.round(data.current.temperature_2m),
+            humidity: data.current.relative_humidity_2m,
+            windSpeed: Math.round(wind),
+            weatherCode: data.current.weather_code,
+            snowDepth: snowDepth > 0 ? snowDepth : "Meetstation offline",
+            openLifts,
+            totalLifts: resort.totalLifts,
+            lastSnowDate: data.daily.time[0],
+            lastSnowAmount: data.daily.snowfall_sum[0],
+            forecast: {
+                time: data.daily.time,
+                weatherCode: data.daily.weather_code,
+                tempMax: data.daily.temperature_2m_max,
+                tempMin: data.daily.temperature_2m_min,
+                snowfall: data.daily.snowfall_sum,
+                uvIndex: data.daily.uv_index_max,
+                sunshine: data.daily.sunshine_duration
+            }
+        };
+    } catch (error) {
+        console.error("Fout bij ophalen weer:", error);
+        return null;
+    }
+}
 
         // Zoek de laatste dag met sneeuwval in de voorspelling of historie
         let lastSnowAmount = data.daily.snowfall_sum[0];
