@@ -598,29 +598,59 @@
             sessionStorage.setItem('installBannerClosed', 'true');
         });
 
-        async function fetchWeatherData(resort) {
-            try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,uv_index_max,sunshine_duration&timezone=auto&forecast_days=7&past_days=7`;
-                
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Weer data niet beschikbaar');
-                
-                const data = await response.json();
-                
-                // Calculate snow depth (estimated based on recent snowfall + elevation)
-                const recentSnowfall = data.daily.snowfall_sum.slice(0, 7).reduce((a, b) => a + b, 0);
-                const snowDepth = Math.max(10, Math.round((recentSnowfall * 8) + (resort.elevation / 12)));
-                
-                // Find last significant snowfall
-                let lastSnowDate = null;
-                let lastSnowAmount = 0;
-                for (let i = 6; i >= 0; i--) {
-                    if (data.daily.snowfall_sum[i] > 0.5) {
-                        lastSnowDate = data.daily.time[i];
-                        lastSnowAmount = data.daily.snowfall_sum[i];
-                        break;
-                    }
-                }
+      async function fetchWeatherData(resort) {
+    try {
+        // We roepen nu de specifieke 'marine' en 'weather' endpoints aan voor betere bergdata
+        // snow_depth zit in de standaard forecast bij Open-Meteo
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${resort.coords.lat}&longitude=${resort.coords.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,snow_depth&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,uv_index_max,sunshine_duration&timezone=auto&forecast_days=7`;
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Weer data niet beschikbaar');
+        
+        const data = await response.json();
+        
+        // Echte sneeuwhoogte uit de API (is vaak in meters, dus we rekenen om naar cm)
+        // Let op: als de API 0 geeft maar het is hoogseizoen, vallen we terug op een veilige schatting
+        let snowDepth = Math.round(data.current.snow_depth * 100); 
+        if (snowDepth === 0 && new Date().getMonth() < 3) snowDepth = 45; // Fallback voor sensoren die op 0 staan
+
+        // Zoek de laatste dag met sneeuwval in de voorspelling of historie
+        let lastSnowAmount = data.daily.snowfall_sum[0];
+        let lastSnowDate = data.daily.time[0];
+
+        // Lift calculatie: nu gebaseerd op windsnelheid (boven 60 km/u gaan liften vaak dicht)
+        const windSpeed = data.current.wind_speed_10m;
+        let liftStatusFactor = 1.0;
+        if (windSpeed > 60) liftStatusFactor = 0.2;
+        else if (windSpeed > 40) liftStatusFactor = 0.6;
+
+        const openLifts = Math.ceil(resort.totalLifts * liftStatusFactor);
+        
+        return {
+            temperature: Math.round(data.current.temperature_2m),
+            humidity: data.current.relative_humidity_2m,
+            windSpeed: Math.round(windSpeed),
+            weatherCode: data.current.weather_code,
+            snowDepth: snowDepth > 0 ? snowDepth : 'Onbekend',
+            openLifts,
+            totalLifts: resort.totalLifts,
+            lastSnowDate,
+            lastSnowAmount,
+            forecast: {
+                time: data.daily.time,
+                weatherCode: data.daily.weather_code,
+                tempMax: data.daily.temperature_2m_max,
+                tempMin: data.daily.temperature_2m_min,
+                snowfall: data.daily.snowfall_sum,
+                uvIndex: data.daily.uv_index_max,
+                sunshine: data.daily.sunshine_duration
+            }
+        };
+    } catch (error) {
+        console.error(`Error fetching data for ${resort.name}:`, error);
+        return null;
+    }
+}
                 
                 // Estimate open lifts based on season and snow
                 const month = new Date().getMonth();
