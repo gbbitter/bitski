@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ski Pro | Schnapps & Real-Time</title>
+    <title>Ski Pro | Schnapps & Snow</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,7 +11,7 @@
             --accent-cyan: #00e5ff;
             --accent-blue: #3399ff;
             --accent-gold: #ffd700;
-            --glass: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.08);
         }
 
         body {
@@ -25,107 +25,112 @@
         .container { max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
         
         header { text-align: center; padding: 20px 0; }
-        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 1px; margin: 0; line-height: 0.9; background: linear-gradient(to bottom, #fff, var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .schnapps-bar { display: flex; justify-content: center; gap: 15px; margin: 10px 0; font-size: 1.5rem; }
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.2rem; letter-spacing: 1px; margin: 0; line-height: 0.9; background: linear-gradient(to bottom, #fff, var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .menu-item {
-            background: var(--glass); backdrop-filter: blur(15px); padding: 22px; border-radius: 24px;
+            background: var(--glass); backdrop-filter: blur(15px); padding: 20px; border-radius: 24px;
             display: flex; justify-content: space-between; align-items: center;
             border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; cursor: pointer;
         }
 
         .page { display: none; }
-        .page.active { display: block; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50px; padding: 10px 20px; margin-bottom: 15px; cursor: pointer; font-weight: 800; }
+        .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50px; padding: 10px 20px; margin-bottom: 15px; cursor: pointer; }
 
-        .stat-grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: var(--glass); padding: 15px; border-radius: 18px; text-align: center; border: 1px solid rgba(0, 229, 255, 0.3); }
-        .stat-val { font-size: 1.5rem; font-weight: 800; display: block; color: var(--accent-cyan); }
-        .stat-label { font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; }
+        .snow-card { background: rgba(0, 229, 255, 0.15); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid var(--accent-cyan); }
+        .depth-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
+        .depth-bar { height: 8px; background: rgba(255,255,255,0.1); flex-grow: 1; margin: 0 15px; border-radius: 4px; overflow: hidden; }
+        .depth-fill { height: 100%; background: white; box-shadow: 0 0 10px var(--accent-cyan); }
 
-        .btn { padding: 18px; border-radius: 18px; text-decoration: none; color: white; font-weight: 800; text-align: center; display: block; margin-bottom: 10px; }
-        .btn-live { background: #ff5252; box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); border: 2px solid white; animation: pulse 2s infinite; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-        
-        .venue-card { background: var(--glass); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; border-left: 4px solid var(--accent-gold); margin-bottom: 10px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-box { background: var(--glass); padding: 12px; border-radius: 18px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-val { font-size: 1.3rem; font-weight: 800; display: block; color: var(--accent-cyan); }
+
+        .weather-row { display: flex; overflow-x: auto; gap: 10px; margin: 15px -15px; padding: 0 15px 15px; scrollbar-width: none; }
+        .weather-box { min-width: 75px; background: var(--glass); padding: 12px; border-radius: 16px; text-align: center; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 15px; border-radius: 14px; text-decoration: none; color: white; font-weight: 800; font-size: 0.8rem; text-align: center; }
+        .btn-full { grid-column: span 2; background: white; color: black; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>Hey, Ho,<br>Let it snow!</h1>
-        <div class="schnapps-bar">🍻 🥃 🥨</div>
-    </header>
+    <header><h1>Hey, Ho,<br>Let it snow!</h1><div style="font-size:1.5rem; margin-top:10px;">🍻 🥃 🥨</div></header>
 
     <div id="dashboard" class="page active">
         <div id="menu"></div>
     </div>
 
     <div id="details" class="page">
-        <button class="back-btn" onclick="showDashboard()">← TERUG NAAR BIER</button>
+        <button class="back-btn" onclick="showDashboard()">← OVERZICHT</button>
         <div id="detail-content"></div>
     </div>
 </div>
 
 <script>
     const RESORTS = [
-        { id: 'bergeralm', name: "Bergeralm", region: "Tirol", lifts: 8, slopes: 14, b_url: 'bergeralm', coords: '47.091,11.451' },
-        { id: 'ladurns', name: "Ladurns", region: "Zuid-Tirol", lifts: 3, slopes: 10, b_url: 'ladurns', coords: '46.903,11.415' },
-        { id: 'superdevoluy', name: "Superdévoluy", region: "Frankrijk", lifts: 22, slopes: 60, b_url: 'ledevoluy', coords: '44.673,5.918' }
+        { id: 'bergeralm', name: "Bergeralm", region: "Tirol", lat: 47.091, lon: 11.451, lifts: 8, slopes: 14, snow_berg: 40, snow_dal: 10, b_url: 'bergeralm' },
+        { id: 'ladurns', name: "Ladurns", region: "Zuid-Tirol", lat: 46.903, lon: 11.415, lifts: 3, slopes: 10, snow_berg: 50, snow_dal: 20, b_url: 'ladurns' },
+        { id: 'superdevoluy', name: "Superdévoluy", region: "Frankrijk", lat: 44.673, lon: 5.918, lifts: 22, slopes: 60, snow_berg: 165, snow_dal: 40, b_url: 'ledevoluy' }
     ];
 
-    function showDetails(id) {
+    async function showDetails(id) {
         const resort = RESORTS.find(r => r.id === id);
         const detailContent = document.getElementById('detail-content');
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('details').classList.add('active');
+        
+        detailContent.innerHTML = '<p style="text-align:center; padding:40px;">Data ophalen... 🥃</p>';
 
-        detailContent.innerHTML = `
-            <h2 style="font-family:'Bebas Neue'; font-size:3.2rem; margin:0;">${resort.name}</h2>
-            <p style="color:var(--accent-cyan); margin-top:0; font-weight:800;">${resort.region}</p>
+        try {
+            const wResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum&timezone=auto`);
+            const weather = await wResp.json();
 
-            <a href="https://www.bergfex.com/${resort.b_url}/schneebericht/" target="_blank" class="btn btn-live">
-                📊 OPEN LIVE BERGFEX DATA<br>
-                <span style="font-size:0.7rem; font-weight:400;">(Check hier de 165cm & status)</span>
-            </a>
+            detailContent.innerHTML = `
+                <h2 style="font-family:'Bebas Neue'; font-size:3rem; margin:0;">${resort.name}</h2>
+                <p style="color:var(--accent-cyan); font-weight:800; margin-top:0;">${resort.region} • 📍 Live Status</p>
 
-            <div class="stat-grid-main">
-                <div class="stat-box"><span class="stat-label">Totaal Pistes</span><span class="stat-val">🎿 ${resort.slopes}</span></div>
-                <div class="stat-box"><span class="stat-label">Totaal Liften</span><span class="stat-val">🚠 ${resort.lifts}</span></div>
-            </div>
+                <div class="snow-card">
+                    <div style="font-size:0.7rem; font-weight:800; margin-bottom:10px; color:var(--accent-cyan);">SNEEUWHOOGTE (CM)</div>
+                    <div class="depth-row"><span>Berg</span><div class="depth-bar"><div class="depth-fill" style="width:${resort.snow_berg/2}%"></div></div><b>${resort.snow_berg}</b></div>
+                    <div class="depth-row"><span>Dal</span><div class="depth-bar"><div class="depth-fill" style="width:${resort.snow_dal/2}%"></div></div><b>${resort.snow_dal}</b></div>
+                </div>
 
-            <h3 style="font-family:'Bebas Neue'; color:var(--accent-gold); margin-top:30px;">SNELMENU 🍻</h3>
-            
-            <a href="https://www.google.com/maps/search/apres+ski+${resort.name}" target="_blank" class="venue-card">
-                <span style="font-size:1.5rem;">🍻</span>
-                <div><div style="font-weight:800;">Après-ski in de buurt</div><div style="font-size:0.7rem;">Zoek direct in Maps ➔</div></div>
-            </a>
+                <div class="stat-grid">
+                    <div class="stat-box"><span class="stat-val">🎿 ${resort.slopes}</span><span style="font-size:0.6rem; opacity:0.6;">PISTES</span></div>
+                    <div class="stat-box"><span class="stat-val">🚠 ${resort.lifts}</span><span style="font-size:0.6rem; opacity:0.6;">LIFTEN</span></div>
+                </div>
 
-            <a href="https://www.bergfex.com/${resort.b_url}/webcams/" target="_blank" class="venue-card" style="border-left-color:var(--accent-blue);">
-                <span style="font-size:1.5rem;">📸</span>
-                <div><div style="font-weight:800;">Live Webcams</div><div style="font-size:0.7rem;">Bekijk de berg ➔</div></div>
-            </a>
+                <div class="weather-row">
+                    ${weather.daily.time.map((t, i) => `
+                        <div class="weather-box">
+                            <div style="font-size:0.6rem; opacity:0.7;">${new Date(t).toLocaleDateString('nl', {weekday:'short'})}</div>
+                            <div style="font-size:1.4rem; margin:5px 0;">${getIcon(weather.daily.weather_code[i])}</div>
+                            <div style="font-weight:800;">${Math.round(weather.daily.temperature_2m_max[i])}°</div>
+                        </div>
+                    `).join('')}
+                </div>
 
-            <div style="margin-top:20px;">
-                <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.coords}" target="_blank" class="btn" style="background:#fff; color:#000;">🚗 START NAVIGATIE</a>
-                <a href="https://www.bergfex.com/${resort.b_url}/panorama/" target="_blank" class="btn" style="background:#2ecc71;">🗺️ PISTEPLAN</a>
-            </div>
-        `;
+                <div class="btn-group">
+                    <a href="https://www.bergfex.com/${resort.b_url}/webcams/" target="_blank" class="btn" style="background:var(--accent-blue)">📸 WEBCAMS</a>
+                    <a href="https://www.bergfex.com/${resort.b_url}/panorama/" target="_blank" class="btn" style="background:#2ecc71">🗺️ PISTEPLAN</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-full">🚗 START AUTO-NAVIGATIE</a>
+                </div>
+            `;
+        } catch (e) { detailContent.innerHTML = '<p>Check je verbinding!</p>'; }
     }
 
-    function showDashboard() {
-        document.getElementById('details').classList.remove('active');
-        document.getElementById('dashboard').style.display = 'block';
-    }
+    function getIcon(code) { return code >= 71 ? '❄️' : (code >= 1 && code <= 3 ? '☀️' : '☁️'); }
+    function showDashboard() { document.getElementById('details').classList.remove('active'); document.getElementById('dashboard').style.display = 'block'; }
 
     document.getElementById('menu').innerHTML = RESORTS.map(r => `
         <div class="menu-item" onclick="showDetails('${r.id}')">
-            <div><div style="font-size:1.5rem; font-weight:800;">${r.name}</div><div style="font-size:0.8rem; color:var(--accent-cyan);">${r.slopes} Pistes • ${r.lifts} Liften</div></div>
-            <div style="font-size:1.8rem;">⛷️</div>
+            <div><div style="font-size:1.4rem; font-weight:800;">${r.name}</div><div style="font-size:0.75rem; color:var(--accent-cyan); font-weight:bold;">${r.slopes} PISTES • ${r.snow_berg}CM SNOW</div></div>
+            <div style="font-size:1.6rem;">⛷️</div>
         </div>
     `).join('');
 </script>
