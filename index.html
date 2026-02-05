@@ -231,4 +231,12 @@
     const canvas = document.getElementById('snow-canvas');
     const ctx = canvas.getContext('2d');
     let flakes = [];
-    function initSnow() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; flakes = Array.from({length:50},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.
+    function initSnow() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; flakes = Array.from({length:50},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,d:Math.random()*0.5+0.2}));}
+    function drawSnow() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="white"; ctx.beginPath(); flakes.forEach(f=>{ctx.moveTo(f.x,f.y);ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);}); ctx.fill(); moveSnow(); }
+    function moveSnow() { flakes.forEach(f=>{f.y+=f.d; if(f.y>canvas.height)f.y=-10;}); requestAnimationFrame(drawSnow); }
+
+    initSnow(); drawSnow(); renderMenu();
+    window.addEventListener('resize', initSnow);
+</script>
+</body>
+</html>
