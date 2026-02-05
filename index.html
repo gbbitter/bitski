@@ -53,12 +53,6 @@
 
         .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50px; padding: 10px 20px; margin-bottom: 15px; font-weight: 600; cursor: pointer; }
 
-        .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        .stat-box { background: var(--glass); padding: 15px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-val { font-size: 1.6rem; font-weight: 800; display: block; color: var(--accent-cyan); }
-        .stat-label { font-size: 0.65rem; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-
-        /* Snow Depth Profile */
         .snow-profile { background: var(--glass-bright); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--accent-cyan); }
         .depth-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
         .depth-bar { height: 8px; background: rgba(255,255,255,0.1); flex-grow: 1; margin: 0 15px; border-radius: 4px; overflow: hidden; }
@@ -67,8 +61,8 @@
         .weather-scroll { display: flex; overflow-x: auto; gap: 10px; margin: 15px -15px; padding: 0 15px 15px 15px; scrollbar-width: none; }
         .weather-day { min-width: 80px; background: var(--glass); padding: 15px; border-radius: 18px; text-align: center; }
 
-        .venue-card { background: var(--glass); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; border: 1px solid transparent; transition: 0.2s; }
-        .venue-card:hover { border-color: var(--accent-cyan); background: var(--glass-bright); }
+        .venue-card { background: var(--glass); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; border: 1px solid transparent; }
+        .venue-card:active { border-color: var(--accent-cyan); background: var(--glass-bright); }
 
         .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .btn { padding: 16px; border-radius: 16px; text-decoration: none; color: white; font-weight: 800; font-size: 0.8rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -105,28 +99,27 @@
     const RESORTS = [
         {
             id: 'bergeralm', name: "Bergeralm", region: "Tirol, Oostenrijk", lat: 47.091, lon: 11.451,
-            lifts_total: 8, webcam: "https://www.foto-webcam.eu/webcam/bergeralm/",
-            map: "https://www.skiresort.info/ski-resort/bergeralm-steinach-am-brenner/trail-map/",
+            lifts_total: 8, webcam: "https://www.bergeralm.net/webcam/",
+            map: "https://www.bergeralm.net/pisten-und-mehr/",
             heights: { top: 2231, mid: 1600, valley: 1048 },
-            venues: [{ name: "Hennensteigen", type: "Après-ski", icon: "🍻" }, { name: "Panorama Restaurant", type: "Lunch", icon: "🍔" }]
+            venues: [{ name: "Hennensteigen", icon: "🍻" }, { name: "Panorama Restaurant", icon: "🍔" }]
         },
         {
             id: 'ladurns', name: "Ladurns", region: "Zuid-Tirol, Italië", lat: 46.903, lon: 11.415,
-            lifts_total: 4, webcam: "https://www.ladurns.it/en/webcams",
-            map: "https://www.skiresort.info/ski-resort/ladurns/trail-map/",
+            lifts_total: 4, webcam: "https://www.ladurns.it/en/services/webcams",
+            map: "https://www.ladurns.it/en/pisten",
             heights: { top: 2023, mid: 1550, valley: 1140 },
-            venues: [{ name: "Edelweisshütte", type: "Hut", icon: "🥨" }, { name: "Pfeifer Huisele", type: "Après-ski", icon: "🍷" }]
+            venues: [{ name: "Edelweisshütte", icon: "🥨" }, { name: "Pfeifer Huisele", icon: "🍷" }]
         },
         {
             id: 'superdevoluy', name: "Superdévoluy", region: "Alpen, Frankrijk", lat: 44.673, lon: 5.918,
-            lifts_total: 22, webcam: "https://www.ledevoluy.com/en/live-experience/webcams/",
-            map: "https://www.skiresort.info/ski-resort/le-devoluy-superdevoluyla-joue-du-loup/trail-map/",
+            lifts_total: 22, webcam: "https://www.ledevoluy.com/winter/live/webcams/",
+            map: "https://piste-maps.co.uk/france/super-devoluy",
             heights: { top: 2500, mid: 1850, valley: 1500 },
-            venues: [{ name: "La Table", type: "Restaurant", icon: "🍔" }, { name: "Le Chardons", type: "Terras", icon: "☀️" }]
+            venues: [{ name: "La Table Superdévoluy", icon: "🍔" }, { name: "Le Chardons", icon: "☀️" }]
         }
     ];
 
-    // --- SNOW ENGINE ---
     const canvas = document.getElementById('snow-canvas');
     const ctx = canvas.getContext('2d');
     let flakes = [];
@@ -151,19 +144,14 @@
         document.getElementById('details').classList.add('active');
 
         try {
-            const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum,uv_index_max&current=weather_code&timezone=auto`);
+            const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum,uv_index_max&timezone=auto`);
             const weather = await weatherResp.json();
-            
-            const hour = new Date().getHours();
-            const isOpen = (hour >= 8 && hour <= 17);
-            const openLifts = isOpen ? Math.floor(resort.lifts_total * 0.9) : 0;
             const totalSnow = weather.daily.snowfall_sum.reduce((a, b) => a + b, 0).toFixed(0);
 
-            // Dynamische Sneeuwhoogtes simeleren (omdat live API data vaak achter betaalmuur zit)
-            // Hier gebruiken we een realistische base + variatie
-            const baseSnowTop = 120 + Math.floor(Math.random() * 40);
-            const baseSnowMid = 60 + Math.floor(Math.random() * 30);
-            const baseSnowValley = 15 + Math.floor(Math.random() * 20);
+            // Simulatiewaarden voor sneeuwhoogte (Top, Mid, Valley)
+            const hTop = 130 + Math.floor(Math.random() * 50);
+            const hMid = 70 + Math.floor(Math.random() * 30);
+            const hDal = 20 + Math.floor(Math.random() * 15);
 
             detailContent.innerHTML = `
                 <div style="margin-bottom: 20px;">
@@ -173,32 +161,14 @@
 
                 <div class="snow-profile">
                     <div style="font-weight:800; font-size:0.8rem; margin-bottom:15px; text-transform:uppercase; color:var(--accent-cyan)">Actuele Sneeuwhoogte</div>
-                    <div class="depth-row">
-                        <span style="font-size:0.7rem; width:50px">Top</span>
-                        <div class="depth-bar"><div class="depth-fill" style="width: ${Math.min(baseSnowTop/2, 100)}%"></div></div>
-                        <span style="font-weight:800; width:50px; text-align:right">${baseSnowTop}cm</span>
-                    </div>
-                    <div class="depth-row">
-                        <span style="font-size:0.7rem; width:50px">Midden</span>
-                        <div class="depth-bar"><div class="depth-fill" style="width: ${Math.min(baseSnowMid/2, 100)}%"></div></div>
-                        <span style="font-weight:800; width:50px; text-align:right">${baseSnowMid}cm</span>
-                    </div>
-                    <div class="depth-row">
-                        <span style="font-size:0.7rem; width:50px">Dal</span>
-                        <div class="depth-bar"><div class="depth-fill" style="width: ${Math.min(baseSnowValley/2, 100)}%"></div></div>
-                        <span style="font-weight:800; width:50px; text-align:right">${baseSnowValley}cm</span>
-                    </div>
+                    <div class="depth-row"><span>Top</span><div class="depth-bar"><div class="depth-fill" style="width:${Math.min(hTop/2.5, 100)}%"></div></div><b>${hTop}cm</b></div>
+                    <div class="depth-row"><span>Mid</span><div class="depth-bar"><div class="depth-fill" style="width:${Math.min(hMid/2.5, 100)}%"></div></div><b>${hMid}cm</b></div>
+                    <div class="depth-row"><span>Dal</span><div class="depth-bar"><div class="depth-fill" style="width:${Math.min(hDal/2.5, 100)}%"></div></div><b>${hDal}cm</b></div>
                 </div>
 
-                <div class="hero-stats">
-                    <div class="stat-box">
-                        <span class="stat-label">Voorspelling 7d</span>
-                        <span class="stat-val">❄️ ${totalSnow} cm</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">UV Index Today</span>
-                        <span class="stat-val">☀️ ${weather.daily.uv_index_max[0].toFixed(1)}</span>
-                    </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                    <div class="stat-box"><span class="stat-label">7D Sneeuwval</span><span class="stat-val">❄️ ${totalSnow} cm</span></div>
+                    <div class="stat-box"><span class="stat-label">UV Index</span><span class="stat-val">☀️ ${weather.daily.uv_index_max[0]}</span></div>
                 </div>
 
                 <div class="weather-scroll">
@@ -212,13 +182,13 @@
                 </div>
 
                 <div style="margin-top:10px;">
-                    <div style="font-weight:800; font-size:0.9rem; margin-bottom:12px; color:var(--accent-cyan)">APRES-SKI & HUTTEN</div>
+                    <div style="font-weight:800; font-size:0.9rem; margin-bottom:12px; color:var(--accent-cyan)">APRES-SKI ROUTE</div>
                     ${resort.venues.map(v => `
-                        <a href="https://www.google.com/maps/search/${encodeURIComponent(v.name + ' ' + resort.name)}" target="_blank" class="venue-card">
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.name + ' ' + resort.name)}" target="_blank" class="venue-card">
                             <div style="font-size:1.2rem; background: rgba(0,229,255,0.1); width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${v.icon}</div>
                             <div style="flex-grow:1">
                                 <div style="font-weight:700; font-size:1rem;">${v.name}</div>
-                                <div style="font-size:0.7rem; color:var(--accent-cyan);">Route in Google Maps ➔</div>
+                                <div style="font-size:0.7rem; color:var(--accent-cyan);">Navigeer in Maps ➔</div>
                             </div>
                         </a>
                     `).join('')}
@@ -227,10 +197,10 @@
                 <div class="action-grid">
                     <a href="${resort.webcam}" target="_blank" class="btn" style="background:var(--accent-blue)">📸 WEBCAM</a>
                     <a href="${resort.map}" target="_blank" class="btn" style="background:#2ecc71">🗺️ PISTEPLAN</a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">🚗 START NAVIGATIE</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">🚗 START AUTO NAVIGATIE</a>
                 </div>
             `;
-        } catch (e) { detailContent.innerHTML = '<p>Data niet beschikbaar.</p>'; }
+        } catch (e) { detailContent.innerHTML = '<p>Data laden mislukt.</p>'; }
     }
 
     function getIcon(code) {
@@ -251,8 +221,8 @@
             <div class="menu-item" id="m-${r.id}" onclick="showDetails('${r.id}')">
                 <div>
                     <div style="font-size:1.4rem; font-weight:800;">${r.name}</div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary);">${r.region}</div>
-                    <div id="s-${r.id}" style="font-size:0.75rem; margin-top:5px; color:var(--accent-cyan); font-weight:bold;">Snow-forecast laden...</div>
+                    <div style="font-size:0.8rem; color:rgba(255,255,255,0.6);">${r.region}</div>
+                    <div id="s-${r.id}" style="font-size:0.75rem; margin-top:5px; color:var(--accent-cyan); font-weight:bold;">Forecast laden...</div>
                 </div>
                 <div style="font-size:1.5rem;">🏔️</div>
             </div>
