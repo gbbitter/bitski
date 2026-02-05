@@ -22,7 +22,6 @@
             min-height: 100vh;
         }
 
-        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
         .container { max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
         
         header { text-align: center; padding: 20px 0; }
@@ -41,28 +40,20 @@
 
         .back-btn { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 50px; padding: 10px 20px; margin-bottom: 15px; cursor: pointer; font-weight: 800; }
 
-        .snow-profile { background: rgba(0, 229, 255, 0.1); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--accent-cyan); }
-        .depth-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .depth-bar { height: 10px; background: rgba(255,255,255,0.1); flex-grow: 1; margin: 0 15px; border-radius: 5px; overflow: hidden; }
-        .depth-fill { height: 100%; background: linear-gradient(90deg, #fff, var(--accent-cyan)); }
-
         .stat-grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: var(--glass); padding: 15px; border-radius: 18px; text-align: center; }
+        .stat-box { background: var(--glass); padding: 15px; border-radius: 18px; text-align: center; border: 1px solid rgba(0, 229, 255, 0.3); }
         .stat-val { font-size: 1.5rem; font-weight: 800; display: block; color: var(--accent-cyan); }
+        .stat-label { font-size: 0.7rem; opacity: 0.6; text-transform: uppercase; }
 
-        .venue-card { background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,215,0,0.05)); padding: 15px; border-radius: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; border-left: 4px solid var(--accent-gold); }
-
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn { padding: 16px; border-radius: 16px; text-decoration: none; color: white; font-weight: 800; font-size: 0.8rem; text-align: center; display: flex; align-items: center; justify-content: center; }
-        .btn-nav { grid-column: span 2; background: #fff; color: #000; }
-
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-cyan); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn { padding: 18px; border-radius: 18px; text-decoration: none; color: white; font-weight: 800; text-align: center; display: block; margin-bottom: 10px; }
+        .btn-live { background: #ff5252; box-shadow: 0 0 15px rgba(255, 82, 82, 0.4); border: 2px solid white; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        
+        .venue-card { background: var(--glass); padding: 15px; border-radius: 18px; display: flex; align-items: center; gap: 15px; text-decoration: none; color: white; border-left: 4px solid var(--accent-gold); margin-bottom: 10px; }
     </style>
 </head>
 <body>
-
-<canvas id="snow-canvas"></canvas>
 
 <div class="container">
     <header>
@@ -82,72 +73,46 @@
 
 <script>
     const RESORTS = [
-        { id: 'bergeralm', name: "Bergeralm", region: "Tirol", lat: 47.091, lon: 11.451, lifts_total: 8, slopes_total: 14, b_url: 'bergeralm' },
-        { id: 'ladurns', name: "Ladurns", region: "Zuid-Tirol", lat: 46.903, lon: 11.415, lifts_total: 3, slopes_total: 10, b_url: 'ladurns' },
-        { id: 'superdevoluy', name: "Superdévoluy", region: "Frankrijk", lat: 44.673, lon: 5.918, lifts_total: 22, slopes_total: 60, b_url: 'ledevoluy' }
+        { id: 'bergeralm', name: "Bergeralm", region: "Tirol", lifts: 8, slopes: 14, b_url: 'bergeralm', coords: '47.091,11.451' },
+        { id: 'ladurns', name: "Ladurns", region: "Zuid-Tirol", lifts: 3, slopes: 10, b_url: 'ladurns', coords: '46.903,11.415' },
+        { id: 'superdevoluy', name: "Superdévoluy", region: "Frankrijk", lifts: 22, slopes: 60, b_url: 'ledevoluy', coords: '44.673,5.918' }
     ];
 
-    async function getBergfexData(resort) {
-        try {
-            // Gebruik AllOrigins om Bergfex live te lezen in de browser van de gebruiker
-            const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.bergfex.com/' + resort.b_url + '/schneebericht/')}`);
-            const data = await response.json();
-            const doc = new DOMParser().parseFromString(data.contents, 'text/html');
-
-            // Zoek specifiek naar de Bergfex waarden in de HTML
-            const berg = doc.querySelector('.snow-mountain .value')?.innerText.replace('cm', '').trim() || "N/A";
-            const dal = doc.querySelector('.snow-valley .value')?.innerText.replace('cm', '').trim() || "N/A";
-            const lifts = doc.querySelector('.lifts-open .value')?.innerText.split('/') || ["?", resort.lifts_total];
-
-            return { berg, dal, open_lifts: lifts[0].trim() };
-        } catch (e) {
-            return { berg: "!", dal: "!", open_lifts: "?" };
-        }
-    }
-
-    async function showDetails(id) {
+    function showDetails(id) {
         const resort = RESORTS.find(r => r.id === id);
         const detailContent = document.getElementById('detail-content');
-        detailContent.innerHTML = '<div class="loader"></div><p style="text-align:center">Live Bergfex data ophalen...</p>';
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('details').classList.add('active');
 
-        const [weatherResp, live] = await Promise.all([
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max&timezone=auto`),
-            getBergfexData(resort)
-        ]);
-        const weather = await weatherResp.json();
-        
-        // Bereken geopende pistes op basis van lifts (omdat Bergfex dit vaak niet apart in een simpele waarde heeft)
-        const liftNum = parseInt(live.open_lifts) || 0;
-        const openSlopes = liftNum > 0 ? Math.round((liftNum / resort.lifts_total) * resort.slopes_total) : 0;
-
         detailContent.innerHTML = `
-            <h2 style="font-family:'Bebas Neue'; font-size:3rem; margin:0;">${resort.name}</h2>
-            <div style="color:var(--accent-cyan); font-weight:800; margin-bottom:20px;">Live van Bergfex.com 🏔️</div>
+            <h2 style="font-family:'Bebas Neue'; font-size:3.2rem; margin:0;">${resort.name}</h2>
+            <p style="color:var(--accent-cyan); margin-top:0; font-weight:800;">${resort.region}</p>
 
-            <div class="snow-profile">
-                <div class="depth-row"><span>Bergstation</span><div class="depth-bar"><div class="depth-fill" style="width:${Math.min(live.berg/2, 100)}%"></div></div><b>${live.berg}cm</b></div>
-                <div class="depth-row"><span>Dalstation</span><div class="depth-bar"><div class="depth-fill" style="width:${Math.min(live.dal/2, 100)}%"></div></div><b>${live.dal}cm</b></div>
-            </div>
-
-            <div class="stat-grid-main">
-                <div class="stat-box"><span style="font-size:0.6rem; opacity:0.6;">LIFTEN</span><span class="stat-val">🚠 ${live.open_lifts}/${resort.lifts_total}</span></div>
-                <div class="stat-box"><span style="font-size:0.6rem; opacity:0.6;">PISTES</span><span class="stat-val">🎿 ${openSlopes}/${resort.slopes_total}</span></div>
-                <div class="stat-box"><span style="font-size:0.6rem; opacity:0.6;">STATUS</span><span class="stat-val">${liftNum > 0 ? 'OPEN' : 'DICHT'}</span></div>
-                <div class="stat-box"><span style="font-size:0.6rem; opacity:0.6;">TEMP</span><span class="stat-val">🌡️ ${Math.round(weather.daily.temperature_2m_max[0])}°C</span></div>
-            </div>
-
-            <h3 style="font-family:'Bebas Neue'; color:var(--accent-gold); letter-spacing:1px; margin-top:30px;">APRÈS-SKI & BIER 🥃🍻</h3>
-            <a href="https://www.google.com/maps/search/apres+ski+${resort.name}" target="_blank" class="venue-card">
-                <span style="font-size:1.5rem;">🍻</span>
-                <div><div style="font-weight:800;">Beste Apres-Ski in de buurt</div><div style="font-size:0.7rem;">Tik voor locaties in Google Maps ➔</div></div>
+            <a href="https://www.bergfex.com/${resort.b_url}/schneebericht/" target="_blank" class="btn btn-live">
+                📊 OPEN LIVE BERGFEX DATA<br>
+                <span style="font-size:0.7rem; font-weight:400;">(Check hier de 165cm & status)</span>
             </a>
 
-            <div class="action-grid">
-                <a href="https://www.google.com/maps/search/${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">🚗 NAVIGATIE</a>
-                <a href="https://www.bergfex.com/${resort.b_url}/webcams/" target="_blank" class="btn" style="background:var(--accent-blue)">📸 WEBCAMS</a>
-                <a href="https://www.bergfex.com/${resort.b_url}/panorama/" target="_blank" class="btn" style="background:#2ecc71">🗺️ PISTEPLAN</a>
+            <div class="stat-grid-main">
+                <div class="stat-box"><span class="stat-label">Totaal Pistes</span><span class="stat-val">🎿 ${resort.slopes}</span></div>
+                <div class="stat-box"><span class="stat-label">Totaal Liften</span><span class="stat-val">🚠 ${resort.lifts}</span></div>
+            </div>
+
+            <h3 style="font-family:'Bebas Neue'; color:var(--accent-gold); margin-top:30px;">SNELMENU 🍻</h3>
+            
+            <a href="https://www.google.com/maps/search/apres+ski+${resort.name}" target="_blank" class="venue-card">
+                <span style="font-size:1.5rem;">🍻</span>
+                <div><div style="font-weight:800;">Après-ski in de buurt</div><div style="font-size:0.7rem;">Zoek direct in Maps ➔</div></div>
+            </a>
+
+            <a href="https://www.bergfex.com/${resort.b_url}/webcams/" target="_blank" class="venue-card" style="border-left-color:var(--accent-blue);">
+                <span style="font-size:1.5rem;">📸</span>
+                <div><div style="font-weight:800;">Live Webcams</div><div style="font-size:0.7rem;">Bekijk de berg ➔</div></div>
+            </a>
+
+            <div style="margin-top:20px;">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.coords}" target="_blank" class="btn" style="background:#fff; color:#000;">🚗 START NAVIGATIE</a>
+                <a href="https://www.bergfex.com/${resort.b_url}/panorama/" target="_blank" class="btn" style="background:#2ecc71;">🗺️ PISTEPLAN</a>
             </div>
         `;
     }
@@ -155,27 +120,14 @@
     function showDashboard() {
         document.getElementById('details').classList.remove('active');
         document.getElementById('dashboard').style.display = 'block';
-        renderMenu();
     }
 
-    function renderMenu() {
-        document.getElementById('menu').innerHTML = RESORTS.map(r => `
-            <div class="menu-item" onclick="showDetails('${r.id}')">
-                <div><div style="font-size:1.4rem; font-weight:800;">${r.name}</div><div style="font-size:0.75rem; color:var(--accent-cyan);">Bekijk live status ➔</div></div>
-                <div style="font-size:1.5rem;">🏔️</div>
-            </div>
-        `).join('');
-    }
-
-    // Snow
-    const canvas = document.getElementById('snow-canvas');
-    const ctx = canvas.getContext('2d');
-    let flakes = [];
-    function initSnow() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; flakes = Array.from({length:40},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,d:Math.random()*0.5+0.2}));}
-    function drawSnow() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="white"; ctx.beginPath(); flakes.forEach(f=>{ctx.moveTo(f.x,f.y);ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);}); ctx.fill(); moveSnow(); }
-    function moveSnow() { flakes.forEach(f=>{f.y+=f.d; if(f.y>canvas.height)f.y=-10;}); requestAnimationFrame(drawSnow); }
-
-    initSnow(); drawSnow(); renderMenu();
+    document.getElementById('menu').innerHTML = RESORTS.map(r => `
+        <div class="menu-item" onclick="showDetails('${r.id}')">
+            <div><div style="font-size:1.5rem; font-weight:800;">${r.name}</div><div style="font-size:0.8rem; color:var(--accent-cyan);">${r.slopes} Pistes • ${r.lifts} Liften</div></div>
+            <div style="font-size:1.8rem;">⛷️</div>
+        </div>
+    `).join('');
 </script>
 </body>
 </html>
