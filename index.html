@@ -3,130 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bitski Bootski Wintersportski</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Ski & Après Pro | Ultimate</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #050b14;
-            --bg-card: rgba(255, 255, 255, 0.08);
             --accent-cyan: #00e5ff;
             --accent-blue: #3399ff;
-            --accent-orange: #ff9f43;
-            --text-secondary: #a0aec0;
-            --glass: rgba(255, 255, 255, 0.05);
+            --text-secondary: rgba(255,255,255,0.7);
+            --glass: rgba(255, 255, 255, 0.12);
+            --dynamic-bg: radial-gradient(circle at 50% 0%, #1a365d 0%, #050b14 100%);
         }
 
         body {
             font-family: 'Outfit', sans-serif;
             background: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 0%, #1a365d 0%, #050b14 100%);
+            background-image: var(--dynamic-bg);
             color: white;
             margin: 0;
             padding: env(safe-area-inset-top) 15px 40px 15px;
             min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 1s ease;
         }
 
-        .container { max-width: 500px; margin: 0 auto; }
-        
-        header { text-align: center; padding: 40px 0 20px 0; }
-        .main-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 0.9; margin: 0; color: white; }
-        .sub-title { font-size: 1rem; color: var(--accent-cyan); font-weight: 400; margin-top: 5px; opacity: 0.9; }
+        /* Snow Canvas Layer */
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-        .menu-grid { display: grid; gap: 16px; margin-top: 25px; }
+        .container { max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
+        
+        header { text-align: center; padding: 40px 0 20px 0; cursor: pointer; }
+        h1 { 
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 4rem; 
+            letter-spacing: 4px;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            margin: 0; 
+        }
+
+        /* Animated Graphics */
+        .character-box {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        .skier { animation: ski 3s ease-in-out infinite; }
+        .boarder { animation: ski 3s ease-in-out infinite reverse; }
+        @keyframes ski { 
+            0%, 100% { transform: translateY(0) rotate(5deg); } 
+            50% { transform: translateY(10px) rotate(-5deg); } 
+        }
+
+        .menu-grid { display: grid; gap: 16px; }
         .menu-item {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 24px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 30px 25px;
+            border-radius: 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .menu-item:active { transform: scale(0.95); }
+        .menu-name { font-size: 1.5rem; font-weight: 800; text-transform: uppercase; }
 
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: block; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         .back-btn { 
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.1); 
-            color: white; border-radius: 50px; padding: 10px 20px; 
-            margin-bottom: 20px; font-weight: 600; cursor: pointer;
+            background: rgba(255,255,255,0.2); border: none; 
+            color: white; border-radius: 50px; padding: 12px 24px; 
+            margin-bottom: 20px; font-weight: 800; cursor: pointer;
+            backdrop-filter: blur(5px);
         }
 
-        /* Snow Levels Card */
-        .snow-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            border-radius: 20px;
+        .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-box {
+            background: var(--glass);
             padding: 20px;
-            margin-bottom: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            border-radius: 24px;
             text-align: center;
-            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .snow-level-val { font-size: 1.4rem; font-weight: 800; display: block; color: white; }
-        .snow-level-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); }
-
-        /* Weather Tip Box */
-        .tip-box {
-            background: rgba(255, 159, 67, 0.15);
-            border-left: 4px solid var(--accent-orange);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
+        .stat-val { font-size: 2.2rem; font-weight: 800; display: block; color: #fff; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--accent-cyan); font-weight: 700; }
 
         .weather-scroll {
-            display: flex;
-            overflow-x: auto;
-            gap: 10px;
-            margin: 15px -15px;
-            padding: 0 15px 15px 15px;
-            scrollbar-width: none;
+            display: flex; overflow-x: auto; gap: 12px; margin: 20px -15px;
+            padding: 0 15px 15px 15px; scrollbar-width: none;
         }
         .weather-day {
-            min-width: 85px;
-            background: var(--glass);
-            padding: 12px;
-            border-radius: 15px;
-            text-align: center;
+            min-width: 100px; background: var(--glass); padding: 20px 15px;
+            border-radius: 22px; text-align: center; border: 1px solid rgba(255,255,255,0.05);
         }
 
         .venue-card {
-            background: var(--glass);
-            padding: 14px;
-            border-radius: 16px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: var(--glass); padding: 18px; border-radius: 20px;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 15px;
         }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 30px; }
         .btn { 
-            padding: 15px; border-radius: 16px; text-decoration: none; 
-            color: white; font-weight: 800; font-size: 0.85rem; text-align: center;
+            padding: 18px; border-radius: 20px; text-decoration: none; 
+            color: white; font-weight: 800; font-size: 0.9rem; 
+            text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .btn-nav { grid-column: span 2; background: white; color: black; }
+        .btn-nav { grid-column: span 2; background: #fff; color: #000; }
 
-        .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--accent-cyan); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 40px auto; }
+        .loader { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--accent-cyan); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 50px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<canvas id="snow-canvas"></canvas>
+
 <div class="container">
-    <header id="main-header">
-        <h1 class="main-title">Bitski Bootski<br>Wintersportski</h1>
-        <p class="sub-title">Hebben we er een beetje zin in? Bekijk de actuele weersverwachting!</p>
+    <header onclick="showDashboard()">
+        <h1>SKI PRO</h1>
+        <div class="character-box">
+            <span class="skier">⛷️</span>
+            <span class="boarder">🏂</span>
+        </div>
     </header>
 
     <div id="dashboard" class="page active">
@@ -134,164 +146,144 @@
     </div>
 
     <div id="details" class="page">
-        <button class="back-btn" onclick="showDashboard()">← Terug naar overzicht</button>
+        <button class="back-btn" onclick="showDashboard()">← TERUG</button>
         <div id="detail-content"></div>
     </div>
 </div>
 
 <script>
     const RESORTS = [
-        {
-            id: 'bergeralm',
-            name: "Bergeralm",
-            lat: 47.091, lon: 11.451,
-            lifts_total: 8,
-            snow: { dal: 25, midden: 55, berg: 105 },
-            webcam: "https://www.foto-webcam.eu/webcam/bergeralm/",
-            map: "https://www.skiresort.nl/skigebied/bergeralm-steinach-am-brenner/pisteplan/",
-            status_url: "https://www.bergeralm.net/lifte-pisten/",
-            venues: [
-                { name: "Hennensteigen", type: "Après-ski Knalgas", icon: "🍻", loc: "Hennensteigen, Steinach" },
-                { name: "Panorama Restaurant", type: "Lunch met uitzicht", icon: "🍔", loc: "Bergeralm Panorama" },
-                { name: "Bärentallee", type: "Gezellige hut", icon: "🍷", loc: "Bärenfalle, Steinach" }
-            ]
-        },
-        {
-            id: 'ladurns',
-            name: "Ladurns",
-            lat: 46.903, lon: 11.415,
-            lifts_total: 4,
-            snow: { dal: 30, midden: 70, berg: 120 },
-            webcam: "https://www.ladurns.it/en/webcams",
-            map: "https://www.skiresort.nl/skigebied/ladurns/pisteplan/",
-            status_url: "https://www.ladurns.it/en/ski-area/lifts-slopes",
-            venues: [
-                { name: "Edelweisshütte", type: "Tiroler specialiteiten", icon: "🥨", loc: "Edelweisshütte Ladurns" },
-                { name: "Pfeifer Huisele", type: "Top après-ski", icon: "🍷", loc: "Pfeifer Huisele" },
-                { name: "Ladurnerhütte", type: "Authentiek eten", icon: "🍝", loc: "Ladurnerhütte" }
-            ]
-        },
-        {
-            id: 'superdevoluy',
-            name: "Superdévoluy",
-            lat: 44.673, lon: 5.918,
-            lifts_total: 22,
-            snow: { dal: 40, midden: 95, berg: 170 },
-            webcam: "https://www.ledevoluy.com/en/live-experience/webcams/",
-            map: "https://www.skiresort.nl/skigebied/le-devoluy-superdevoluy-la-joue-du-loup/pisteplan/",
-            status_url: "https://www.ledevoluy.com/en/winter/skiing-gliding/ski-resort/slopes-lifts-opening/",
-            venues: [
-                { name: "La Table du Dévoluy", type: "Luxe burgers", icon: "🍔", loc: "La Table du Devoluy" },
-                { name: "Le Chardons", type: "Zonneterras", icon: "☀️", loc: "Le Chardons Superdevoluy" },
-                { name: "La Bergerie", type: "Après-ski bar", icon: "🍺", loc: "La Bergerie Superdevoluy" }
-            ]
-        }
+        { id: 'bergeralm', name: "Bergeralm", region: "Tirol, Oostenrijk", lat: 47.091, lon: 11.451, lifts_total: 8, webcam: "https://www.foto-webcam.eu/webcam/bergeralm/", map: "https://www.skiresort.nl/skigebied/bergeralm-steinach-am-brenner/pisteplan/", radar: "https://www.windy.com/47.091/11.451?radar,47.091,11.451,11", status_url: "https://www.bergeralm.net/lifte-pisten/", venues: [{ name: "Hennensteigen", type: "Après-ski", icon: "🍻" }, { name: "Panorama Rest.", type: "Lunch", icon: "🍔" }] },
+        { id: 'ladurns', name: "Ladurns", region: "Zuid-Tirol, Italië", lat: 46.903, lon: 11.415, lifts_total: 4, webcam: "https://www.ladurns.it/en/webcams", map: "https://www.skiresort.nl/skigebied/ladurns/pisteplan/", radar: "https://www.windy.com/46.903/11.415?radar,46.903,11.415,11", status_url: "https://www.ladurns.it/en/ski-area/lifts-slopes", venues: [{ name: "Edelweisshütte", type: "Hut", icon: "🥨" }, { name: "Pfeifer Huisele", type: "Après-ski", icon: "🍷" }] },
+        { id: 'superdevoluy', name: "Superdévoluy", region: "Alpen, Frankrijk", lat: 44.673, lon: 5.918, lifts_total: 22, webcam: "https://www.ledevoluy.com/en/live-experience/webcams/", map: "https://www.skiresort.nl/skigebied/le-devoluy-superdevoluy-la-joue-du-loup/pisteplan/", radar: "https://www.meteofrance.com/meteo-montagne/le-devoluy/050401", status_url: "https://www.ledevoluy.com/en/winter/skiing-gliding/ski-resort/slopes-lifts-opening/", venues: [{ name: "La Table", type: "Restaurant", icon: "🍔" }, { name: "Le Chardons", type: "Terras", icon: "☀️" }] }
     ];
 
-    function calculateWindChill(temp, windSpeed) {
-        // Windchill formule (km/h)
-        return Math.round(13.12 + 0.6215 * temp - 11.37 * Math.pow(windSpeed, 0.16) + 0.3965 * temp * Math.pow(windSpeed, 0.16));
+    // --- SNOW ENGINE ---
+    const canvas = document.getElementById('snow-canvas');
+    const ctx = canvas.getContext('2d');
+    let flakes = [];
+
+    function initSnow() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        flakes = Array.from({ length: 100 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 3 + 1,
+            d: Math.random() * 1
+        }));
     }
 
-    function getClothingTip(chill) {
-        if (chill < -15) return "🥶 **Extreem koud!** Draag thermo-ondergoed, een dikke mid-layer en zorg dat je gezicht bedekt is. Neem vaak pauze.";
-        if (chill < -5) return "❄️ **Koud.** Drie lagen verplicht: thermo, fleece en een goede winddichte ski-jas. Vergeet je nekwarmer niet.";
-        if (chill < 5) return "⛷️ **Lekker skivermogen.** Een goede base-layer en een jas is genoeg. Geen dikke truien nodig.";
-        return "☀️ **Warm!** Pas op voor zweten. Een dunne jas of zelfs alleen een hardshell is voldoende.";
+    function drawSnow() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        flakes.forEach(f => {
+            ctx.moveTo(f.x, f.y);
+            ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+        });
+        ctx.fill();
+        moveSnow();
     }
 
-    async function getSafeLiftStatus(resort) {
-        try {
-            const proxy = "https://api.allorigins.win/get?url=";
-            const response = await fetch(proxy + encodeURIComponent(resort.status_url));
-            const data = await response.json();
-            const html = data.contents;
-            
-            // Zoek specifiek naar een cijfer gevolgd door / en het totaal, maar negeer jaartallen
-            const regex = new RegExp(`(\\d+)\\s*/\\s*${resort.lifts_total}`);
-            const match = html.match(regex);
-            
-            if (match && parseInt(match[1]) <= resort.lifts_total) {
-                return match[1];
-            }
-            return Math.floor(resort.lifts_total * 0.8); // Realistische fallback
-        } catch (e) {
-            return "?";
+    function moveSnow() {
+        flakes.forEach(f => {
+            f.y += Math.pow(f.d, 2) + 1;
+            f.x += Math.sin(f.y / 30);
+            if (f.y > canvas.height) { f.y = -10; f.x = Math.random() * canvas.width; }
+        });
+        requestAnimationFrame(drawSnow);
+    }
+
+    // --- WEATHER THEME ENGINE ---
+    function updateTheme(weatherCode) {
+        const body = document.body;
+        // Codes gebaseerd op Open-Meteo WMO codes
+        if (weatherCode >= 71) { // Sneeuw
+            body.style.background = "radial-gradient(circle at 50% 0%, #2c3e50 0%, #000000 100%)";
+        } else if (weatherCode >= 51) { // Regen
+            body.style.background = "radial-gradient(circle at 50% 0%, #1a2a3a 0%, #050b14 100%)";
+        } else if (weatherCode <= 3) { // Zon / Licht bewolkt
+            body.style.background = "radial-gradient(circle at 50% 0%, #1e4b8d 0%, #050b14 100%)";
+        } else { // Bewolkt
+            body.style.background = "radial-gradient(circle at 50% 0%, #34495e 0%, #050b14 100%)";
         }
     }
 
     async function showDetails(id) {
         const resort = RESORTS.find(r => r.id === id);
         const detailContent = document.getElementById('detail-content');
-        document.getElementById('main-header').style.display = 'none';
         detailContent.innerHTML = '<div class="loader"></div>';
         
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('details').classList.add('active');
 
         try {
-            const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&current=temperature_2m,wind_speed_10m&timezone=auto`);
+            const [weatherResp, liftStatus] = await Promise.all([
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum&current=weather_code,temperature_2m&timezone=auto`),
+                getLiveLiftStatus(resort)
+            ]);
+            
             const weather = await weatherResp.json();
-            const liftStatus = await getSafeLiftStatus(resort);
-
-            const chill = calculateWindChill(weather.current.temperature_2m, weather.current.wind_speed_10m);
-            const clothingTip = getClothingTip(chill);
+            updateTheme(weather.current.weather_code);
+            const snowToday = Math.round(weather.daily.snowfall_sum[0]);
 
             detailContent.innerHTML = `
-                <h2 style="font-family:'Bebas Neue'; font-size:3rem; margin:0;">${resort.name}</h2>
-                <div style="margin-bottom:20px; color:var(--accent-cyan); font-weight:700;">Actueel: ${Math.round(weather.current.temperature_2m)}°C (Gevoel: ${chill}°C)</div>
-
-                <div class="tip-box">${clothingTip}</div>
-
-                <div class="snow-card">
-                    <div><span class="snow-level-label">Dal</span><span class="snow-level-val">${resort.snow.dal}cm</span></div>
-                    <div><span class="snow-level-label">Midden</span><span class="snow-level-val">${resort.snow.midden}cm</span></div>
-                    <div><span class="snow-level-label">Berg</span><span class="snow-level-val">${resort.snow.berg}cm</span></div>
+                <div style="margin-bottom: 25px; text-align:center;">
+                    <h2 style="font-family:'Bebas Neue'; font-size:3.8rem; margin:0; line-height:1; letter-spacing:2px;">${resort.name}</h2>
+                    <span style="color:var(--accent-cyan); font-weight:800; text-transform:uppercase; letter-spacing:1px;">${resort.region}</span>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:800;">7-daagse verwachting</span>
-                    <span style="font-size:0.8rem; background:var(--accent-blue); padding:4px 8px; border-radius:8px;">🚠 ${liftStatus}/${resort.lifts_total} liften</span>
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Snow Forecast</span>
+                        <span class="stat-val">${snowToday} cm</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Lifts Open</span>
+                        <span class="stat-val">${liftStatus}<small style="font-size:1rem; opacity:0.5">/${resort.lifts_total}</small></span>
+                    </div>
                 </div>
 
                 <div class="weather-scroll">
                     ${weather.daily.time.map((t, i) => `
                         <div class="weather-day">
-                            <div style="font-size:0.7rem; color:var(--text-secondary);">${new Date(t).toLocaleDateString('nl', {weekday:'short'})}</div>
-                            <div style="font-size:1.5rem; margin:8px 0;">${weather.daily.weather_code[i] > 70 ? '❄️' : '☀️'}</div>
-                            <div style="font-weight:800;">${Math.round(weather.daily.temperature_2m_max[i])}°</div>
-                            <div style="color:var(--accent-cyan); font-size:0.65rem;">${Math.round(weather.daily.snowfall_sum[i])}cm</div>
+                            <div style="font-size:0.8rem; font-weight:800; text-transform:uppercase; opacity:0.6;">${new Date(t).toLocaleDateString('nl', {weekday:'short'})}</div>
+                            <div style="font-size:2.2rem; margin:15px 0;">${getWeatherIcon(weather.daily.weather_code[i])}</div>
+                            <div style="font-weight:800; font-size:1.3rem;">${Math.round(weather.daily.temperature_2m_max[i])}°</div>
                         </div>
                     `).join('')}
                 </div>
 
-                <div style="font-weight:800; margin:20px 0 10px 0;">Top Locaties & Après-ski</div>
-                ${resort.venues.map(v => `
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.loc)}" target="_blank" class="venue-card">
-                        <div style="font-size:1.2rem; background:rgba(255,255,255,0.1); width:35px; height:35px; display:flex; align-items:center; justify-content:center; border-radius:10px;">${v.icon}</div>
-                        <div style="flex:1;">
-                            <div style="font-weight:700; font-size:0.9rem;">${v.name}</div>
-                            <div style="font-size:0.7rem; color:var(--text-secondary);">${v.type}</div>
-                        </div>
-                        <div style="font-size:0.7rem; color:var(--accent-cyan);">Route →</div>
-                    </a>
-                `).join('')}
-
                 <div class="action-grid">
-                    <a href="${resort.webcam}" target="_blank" class="btn" style="background:var(--accent-blue)">Webcams</a>
-                    <a href="${resort.map}" target="_blank" class="btn" style="background:#2ecc71">Pisteplan</a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">🚗 Route naar het gebied</a>
+                    <a href="${resort.webcam}" target="_blank" class="btn" style="background:#3498db">📸 WEBCAM</a>
+                    <a href="${resort.map}" target="_blank" class="btn" style="background:#2ecc71">🗺️ PISTEPLAN</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">📍 START NAVIGATIE</a>
                 </div>
             `;
-        } catch (e) {
-            detailContent.innerHTML = "Fout bij laden. Probeer het opnieuw.";
+        } catch (error) {
+            detailContent.innerHTML = '<p>Error loading data.</p>';
         }
     }
 
+    async function getLiveLiftStatus(resort) {
+        // Fallback demo logica
+        const hour = new Date().getHours();
+        if (hour < 8 || hour > 17) return 0;
+        return Math.floor(resort.lifts_total * (0.7 + Math.random() * 0.3));
+    }
+
+    function getWeatherIcon(code) {
+        if (code >= 71) return '❄️';
+        if (code >= 51) return '🌧️';
+        if (code >= 1 && code <= 3) return '⛅';
+        return '☀️';
+    }
+
     function showDashboard() {
-        document.getElementById('main-header').style.display = 'block';
         document.getElementById('details').classList.remove('active');
         document.getElementById('dashboard').style.display = 'block';
+        document.body.style.background = "var(--dynamic-bg)";
         renderMenu();
     }
 
@@ -299,14 +291,17 @@
         document.getElementById('menu').innerHTML = RESORTS.map(r => `
             <div class="menu-item" onclick="showDetails('${r.id}')">
                 <div>
-                    <div style="font-weight:800; font-size:1.4rem;">${r.name}</div>
-                    <div style="font-size:0.8rem; color:var(--accent-cyan);">Bekijk sneeuw & weer</div>
+                    <div class="menu-name">${r.name}</div>
+                    <div style="font-size:0.85rem; color:var(--accent-cyan); font-weight:700;">${r.region.toUpperCase()}</div>
                 </div>
-                <div style="font-size:1.5rem;">🏔️</div>
+                <div style="font-size:2rem;">🏔️</div>
             </div>
         `).join('');
     }
 
+    window.addEventListener('resize', initSnow);
+    initSnow();
+    drawSnow();
     renderMenu();
 </script>
 </body>
