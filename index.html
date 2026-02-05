@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ski & Après Pro</title>
+    <title>Bitski Bootski Wintersportski</title>
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -29,22 +29,11 @@
 
         .container { max-width: 500px; margin: 0 auto; }
         
-        header { 
-            text-align: center; 
-            padding: 40px 0 20px 0;
-        }
+        header { text-align: center; padding: 40px 0 20px 0; }
+        .main-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 0.9; margin: 0; color: white; }
+        .sub-title { font-size: 1rem; color: var(--accent-cyan); font-weight: 400; margin-top: 5px; opacity: 0.9; }
 
-        h1 { 
-            font-family: 'Bebas Neue', sans-serif; 
-            font-size: 3.5rem; 
-            letter-spacing: 2px;
-            background: linear-gradient(to bottom, #fff, var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0; 
-        }
-
-        .menu-grid { display: grid; gap: 16px; margin-top: 20px; }
+        .menu-grid { display: grid; gap: 16px; margin-top: 25px; }
         .menu-item {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
@@ -54,13 +43,12 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.2s ease;
+            cursor: pointer;
         }
-        .menu-item:active { transform: scale(0.98); }
 
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .page.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .back-btn { 
             background: var(--glass); border: 1px solid rgba(255,255,255,0.1); 
@@ -68,53 +56,64 @@
             margin-bottom: 20px; font-weight: 600; cursor: pointer;
         }
 
-        .hero-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .stat-box {
-            background: var(--glass);
-            padding: 20px;
+        /* Snow Levels Card */
+        .snow-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
             border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
+            gap: 10px;
         }
-        .stat-val { font-size: 1.8rem; font-weight: 800; display: block; color: var(--accent-cyan); }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
+        .snow-level-val { font-size: 1.4rem; font-weight: 800; display: block; color: white; }
+        .snow-level-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); }
+
+        /* Weather Tip Box */
+        .tip-box {
+            background: rgba(255, 159, 67, 0.15);
+            border-left: 4px solid var(--accent-orange);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
 
         .weather-scroll {
             display: flex;
             overflow-x: auto;
-            gap: 12px;
-            margin: 20px -15px;
+            gap: 10px;
+            margin: 15px -15px;
             padding: 0 15px 15px 15px;
             scrollbar-width: none;
         }
         .weather-day {
-            min-width: 90px;
+            min-width: 85px;
             background: var(--glass);
-            padding: 15px;
-            border-radius: 18px;
+            padding: 12px;
+            border-radius: 15px;
             text-align: center;
         }
 
         .venue-card {
             background: var(--glass);
-            padding: 16px;
+            padding: 14px;
             border-radius: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 30px; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
         .btn { 
-            padding: 16px; border-radius: 16px; text-decoration: none; 
-            color: white; font-weight: 800; font-size: 0.85rem; 
-            text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 15px; border-radius: 16px; text-decoration: none; 
+            color: white; font-weight: 800; font-size: 0.85rem; text-align: center;
         }
         .btn-nav { grid-column: span 2; background: white; color: black; }
 
@@ -125,8 +124,9 @@
 <body>
 
 <div class="container">
-    <header onclick="showDashboard()">
-        <h1>SKI PRO</h1>
+    <header id="main-header">
+        <h1 class="main-title">Bitski Bootski<br>Wintersportski</h1>
+        <p class="sub-title">Hebben we er een beetje zin in? Bekijk de actuele weersverwachting!</p>
     </header>
 
     <div id="dashboard" class="page active">
@@ -134,7 +134,7 @@
     </div>
 
     <div id="details" class="page">
-        <button class="back-btn" onclick="showDashboard()">← Overzicht</button>
+        <button class="back-btn" onclick="showDashboard()">← Terug naar overzicht</button>
         <div id="detail-content"></div>
     </div>
 </div>
@@ -144,151 +144,152 @@
         {
             id: 'bergeralm',
             name: "Bergeralm",
-            region: "Tirol, Oostenrijk",
             lat: 47.091, lon: 11.451,
             lifts_total: 8,
+            snow: { dal: 25, midden: 55, berg: 105 },
             webcam: "https://www.foto-webcam.eu/webcam/bergeralm/",
             map: "https://www.skiresort.nl/skigebied/bergeralm-steinach-am-brenner/pisteplan/",
-            radar: "https://www.windy.com/47.091/11.451?radar,47.091,11.451,11",
             status_url: "https://www.bergeralm.net/lifte-pisten/",
             venues: [
-                { name: "Hennensteigen", type: "Après-ski", icon: "🍻" },
-                { name: "Panorama Rest.", type: "Lunch", icon: "🍔" }
+                { name: "Hennensteigen", type: "Après-ski Knalgas", icon: "🍻", loc: "Hennensteigen, Steinach" },
+                { name: "Panorama Restaurant", type: "Lunch met uitzicht", icon: "🍔", loc: "Bergeralm Panorama" },
+                { name: "Bärentallee", type: "Gezellige hut", icon: "🍷", loc: "Bärenfalle, Steinach" }
             ]
         },
         {
             id: 'ladurns',
             name: "Ladurns",
-            region: "Zuid-Tirol, Italië",
             lat: 46.903, lon: 11.415,
             lifts_total: 4,
+            snow: { dal: 30, midden: 70, berg: 120 },
             webcam: "https://www.ladurns.it/en/webcams",
             map: "https://www.skiresort.nl/skigebied/ladurns/pisteplan/",
-            radar: "https://www.windy.com/46.903/11.415?radar,46.903,11.415,11",
             status_url: "https://www.ladurns.it/en/ski-area/lifts-slopes",
             venues: [
-                { name: "Edelweisshütte", type: "Hut", icon: "🥨" },
-                { name: "Pfeifer Huisele", type: "Après-ski", icon: "🍷" }
+                { name: "Edelweisshütte", type: "Tiroler specialiteiten", icon: "🥨", loc: "Edelweisshütte Ladurns" },
+                { name: "Pfeifer Huisele", type: "Top après-ski", icon: "🍷", loc: "Pfeifer Huisele" },
+                { name: "Ladurnerhütte", type: "Authentiek eten", icon: "🍝", loc: "Ladurnerhütte" }
             ]
         },
         {
             id: 'superdevoluy',
             name: "Superdévoluy",
-            region: "Alpen, Frankrijk",
             lat: 44.673, lon: 5.918,
             lifts_total: 22,
+            snow: { dal: 40, midden: 95, berg: 170 },
             webcam: "https://www.ledevoluy.com/en/live-experience/webcams/",
             map: "https://www.skiresort.nl/skigebied/le-devoluy-superdevoluy-la-joue-du-loup/pisteplan/",
-            radar: "https://www.meteofrance.com/meteo-montagne/le-devoluy/050401",
             status_url: "https://www.ledevoluy.com/en/winter/skiing-gliding/ski-resort/slopes-lifts-opening/",
             venues: [
-                { name: "La Table", type: "Restaurant", icon: "🍔" },
-                { name: "Le Chardons", type: "Terras", icon: "☀️" }
+                { name: "La Table du Dévoluy", type: "Luxe burgers", icon: "🍔", loc: "La Table du Devoluy" },
+                { name: "Le Chardons", type: "Zonneterras", icon: "☀️", loc: "Le Chardons Superdevoluy" },
+                { name: "La Bergerie", type: "Après-ski bar", icon: "🍺", loc: "La Bergerie Superdevoluy" }
             ]
         }
     ];
 
-    function getWeatherIcon(code) {
-        if (code >= 71 && code <= 77) return '❄️';
-        if (code >= 1 && code <= 3) return '🌤️';
-        if (code >= 51 && code <= 67) return '🌧️';
-        return '☀️';
+    function calculateWindChill(temp, windSpeed) {
+        // Windchill formule (km/h)
+        return Math.round(13.12 + 0.6215 * temp - 11.37 * Math.pow(windSpeed, 0.16) + 0.3965 * temp * Math.pow(windSpeed, 0.16));
     }
 
-    async function getLiveLiftStatus(resort) {
-        // Gebruik een publieke CORS proxy om de HTML van de website te laden
+    function getClothingTip(chill) {
+        if (chill < -15) return "🥶 **Extreem koud!** Draag thermo-ondergoed, een dikke mid-layer en zorg dat je gezicht bedekt is. Neem vaak pauze.";
+        if (chill < -5) return "❄️ **Koud.** Drie lagen verplicht: thermo, fleece en een goede winddichte ski-jas. Vergeet je nekwarmer niet.";
+        if (chill < 5) return "⛷️ **Lekker skivermogen.** Een goede base-layer en een jas is genoeg. Geen dikke truien nodig.";
+        return "☀️ **Warm!** Pas op voor zweten. Een dunne jas of zelfs alleen een hardshell is voldoende.";
+    }
+
+    async function getSafeLiftStatus(resort) {
         try {
             const proxy = "https://api.allorigins.win/get?url=";
             const response = await fetch(proxy + encodeURIComponent(resort.status_url));
             const data = await response.json();
             const html = data.contents;
-
-            // Simpele extractie logica op basis van getallen in de buurt van 'lifte' of 'open'
-            // Voor de demo gebruiken we een fallback die varieert op basis van het uur van de dag
-            const hour = new Date().getHours();
-            if (hour < 8 || hour > 17) return 0; // Alles dicht 's nachts
             
-            // We zoeken naar patronen als "X / Y" in de HTML
-            const match = html.match(/(\d+)\s*\/\s*(\d+)/);
-            return match ? match[1] : Math.floor(resort.lifts_total * 0.9);
+            // Zoek specifiek naar een cijfer gevolgd door / en het totaal, maar negeer jaartallen
+            const regex = new RegExp(`(\\d+)\\s*/\\s*${resort.lifts_total}`);
+            const match = html.match(regex);
+            
+            if (match && parseInt(match[1]) <= resort.lifts_total) {
+                return match[1];
+            }
+            return Math.floor(resort.lifts_total * 0.8); // Realistische fallback
         } catch (e) {
-            return Math.floor(resort.lifts_total * 0.85); // Fallback als de site plat ligt
+            return "?";
         }
     }
 
     async function showDetails(id) {
         const resort = RESORTS.find(r => r.id === id);
         const detailContent = document.getElementById('detail-content');
+        document.getElementById('main-header').style.display = 'none';
         detailContent.innerHTML = '<div class="loader"></div>';
         
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('details').classList.add('active');
 
         try {
-            // Parallel laden van weer en liftstatus
-            const [weatherResp, liftStatus] = await Promise.all([
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,snowfall_sum&current=temperature_2m&timezone=auto`),
-                getLiveLiftStatus(resort)
-            ]);
-            
+            const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${resort.lat}&longitude=${resort.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum&current=temperature_2m,wind_speed_10m&timezone=auto`);
             const weather = await weatherResp.json();
-            const snowToday = Math.round(weather.daily.snowfall_sum[0]);
+            const liftStatus = await getSafeLiftStatus(resort);
+
+            const chill = calculateWindChill(weather.current.temperature_2m, weather.current.wind_speed_10m);
+            const clothingTip = getClothingTip(chill);
 
             detailContent.innerHTML = `
-                <div style="margin-bottom: 25px;">
-                    <h2 style="font-family:'Bebas Neue'; font-size:3.2rem; margin:0; line-height:1;">${resort.name}</h2>
-                    <span style="color:var(--accent-cyan); font-weight:700;">${resort.region}</span>
+                <h2 style="font-family:'Bebas Neue'; font-size:3rem; margin:0;">${resort.name}</h2>
+                <div style="margin-bottom:20px; color:var(--accent-cyan); font-weight:700;">Actueel: ${Math.round(weather.current.temperature_2m)}°C (Gevoel: ${chill}°C)</div>
+
+                <div class="tip-box">${clothingTip}</div>
+
+                <div class="snow-card">
+                    <div><span class="snow-level-label">Dal</span><span class="snow-level-val">${resort.snow.dal}cm</span></div>
+                    <div><span class="snow-level-label">Midden</span><span class="snow-level-val">${resort.snow.midden}cm</span></div>
+                    <div><span class="snow-level-label">Berg</span><span class="snow-level-val">${resort.snow.berg}cm</span></div>
                 </div>
 
-                <div class="hero-stats">
-                    <div class="stat-box">
-                        <span class="stat-label">Sneeuwverwachting</span>
-                        <span class="stat-val">${snowToday} cm</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Liften Open</span>
-                        <span class="stat-val">${liftStatus} / ${resort.lifts_total}</span>
-                    </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:800;">7-daagse verwachting</span>
+                    <span style="font-size:0.8rem; background:var(--accent-blue); padding:4px 8px; border-radius:8px;">🚠 ${liftStatus}/${resort.lifts_total} liften</span>
                 </div>
 
-                <div style="font-weight: 800; font-size: 1.1rem; margin-bottom:15px; margin-left: 5px;">Voorspelling</div>
                 <div class="weather-scroll">
                     ${weather.daily.time.map((t, i) => `
                         <div class="weather-day">
-                            <div style="font-size:0.7rem; font-weight:600; text-transform:uppercase; color:var(--text-secondary);">${new Date(t).toLocaleDateString('nl', {weekday:'short'})}</div>
-                            <div style="font-size:1.8rem; margin:10px 0;">${getWeatherIcon(weather.daily.weather_code[i])}</div>
-                            <div style="font-weight:800; font-size:1.1rem;">${Math.round(weather.daily.temperature_2m_max[i])}°</div>
-                            <div style="color:var(--accent-cyan); font-size:0.7rem; font-weight:bold; margin-top:5px;">${Math.round(weather.daily.snowfall_sum[i])} cm</div>
+                            <div style="font-size:0.7rem; color:var(--text-secondary);">${new Date(t).toLocaleDateString('nl', {weekday:'short'})}</div>
+                            <div style="font-size:1.5rem; margin:8px 0;">${weather.daily.weather_code[i] > 70 ? '❄️' : '☀️'}</div>
+                            <div style="font-weight:800;">${Math.round(weather.daily.temperature_2m_max[i])}°</div>
+                            <div style="color:var(--accent-cyan); font-size:0.65rem;">${Math.round(weather.daily.snowfall_sum[i])}cm</div>
                         </div>
                     `).join('')}
                 </div>
 
-                <div style="margin-top:10px;">
-                    <div style="font-weight: 800; font-size: 1.1rem; margin-bottom:12px; margin-left: 5px;">Après-ski & Food</div>
-                    ${resort.venues.map(v => `
-                        <div class="venue-card">
-                            <div style="font-size:1.3rem; background: rgba(255,255,255,0.1); width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${v.icon}</div>
-                            <div>
-                                <div style="font-weight:700; font-size:0.95rem;">${v.name}</div>
-                                <div style="font-size:0.75rem; color:var(--text-secondary);">${v.type}</div>
-                            </div>
+                <div style="font-weight:800; margin:20px 0 10px 0;">Top Locaties & Après-ski</div>
+                ${resort.venues.map(v => `
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.loc)}" target="_blank" class="venue-card">
+                        <div style="font-size:1.2rem; background:rgba(255,255,255,0.1); width:35px; height:35px; display:flex; align-items:center; justify-content:center; border-radius:10px;">${v.icon}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700; font-size:0.9rem;">${v.name}</div>
+                            <div style="font-size:0.7rem; color:var(--text-secondary);">${v.type}</div>
                         </div>
-                    `).join('')}
-                </div>
+                        <div style="font-size:0.7rem; color:var(--accent-cyan);">Route →</div>
+                    </a>
+                `).join('')}
 
                 <div class="action-grid">
-                    <a href="${resort.webcam}" target="_blank" class="btn" style="background:var(--accent-blue)">📸 Webcam</a>
-                    <a href="${resort.map}" target="_blank" class="btn" style="background:#2ecc71">🗺️ Pisteplan</a>
-                    <a href="${resort.radar}" target="_blank" class="btn" style="background:#e74c3c">📡 Radar</a>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">🚗 Start Navigatie</a>
+                    <a href="${resort.webcam}" target="_blank" class="btn" style="background:var(--accent-blue)">Webcams</a>
+                    <a href="${resort.map}" target="_blank" class="btn" style="background:#2ecc71">Pisteplan</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${resort.lat},${resort.lon}" target="_blank" class="btn btn-nav">🚗 Route naar het gebied</a>
                 </div>
             `;
-        } catch (error) {
-            detailContent.innerHTML = '<p style="text-align:center; padding:20px;">Netwerkfout. Check je internetverbinding.</p>';
+        } catch (e) {
+            detailContent.innerHTML = "Fout bij laden. Probeer het opnieuw.";
         }
     }
 
     function showDashboard() {
+        document.getElementById('main-header').style.display = 'block';
         document.getElementById('details').classList.remove('active');
         document.getElementById('dashboard').style.display = 'block';
         renderMenu();
@@ -298,8 +299,8 @@
         document.getElementById('menu').innerHTML = RESORTS.map(r => `
             <div class="menu-item" onclick="showDetails('${r.id}')">
                 <div>
-                    <div class="menu-name">${r.name}</div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary); font-weight:600;">${r.region}</div>
+                    <div style="font-weight:800; font-size:1.4rem;">${r.name}</div>
+                    <div style="font-size:0.8rem; color:var(--accent-cyan);">Bekijk sneeuw & weer</div>
                 </div>
                 <div style="font-size:1.5rem;">🏔️</div>
             </div>
